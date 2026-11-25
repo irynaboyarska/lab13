@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import './reset_password_screen.dart';
 import './signup_screen.dart';
+import 'package:dio/dio.dart';
+import '../api_service.dart';
 
 void showMessage(BuildContext context, String text) {
   showDialog(
@@ -57,9 +59,20 @@ class _SignInScreenState extends State<SignInScreen> {
     return null;
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    try {
+      await ApiService().login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (!mounted) return;
       showMessage(context, 'Authorization successful!');
+    } on DioException catch (e) {
+      if (!mounted) return;
+      showMessage(context, 'Error: ${e.message}');
     }
   }
 

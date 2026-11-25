@@ -1,5 +1,6 @@
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lab09/api_service.dart';
 import './sign_in_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -29,9 +30,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return null;
   }
 
-  void _resetPassword() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _resetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await ApiService().resetPassword(_emailController.text.trim());
+      if (!mounted) return;
       showMessage(context, 'Password reset instructions sent!');
+    } on DioException catch (e) {
+      if (!mounted) return;
+      showMessage(context, 'Error: ${e.message}');
     }
   }
 

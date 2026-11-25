@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import './sign_in_screen.dart';
+import 'package:dio/dio.dart';
+import '../api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -49,9 +51,21 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
-  void _signup() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _signup() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    try {
+      await ApiService().signUp(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (!mounted) return;
       showMessage(context, 'Registration successful!');
+    } on DioException catch (e) {
+      if (!mounted) return;
+      showMessage(context, 'Error: ${e.message}');
     }
   }
 
